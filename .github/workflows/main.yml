@@ -1,1 +1,63 @@
 
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Node dependencies & Build Web App
+      run: |
+        npm install
+        npm run build
+
+    - name: Install Python tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install pywebview pyinstaller
+
+    - name: Create Python Desktop Launcher
+      run: |
+        Set-Content -Path app_launcher.py -Value @"
+        import webview
+        import os
+        import sys
+
+        def get_resource_path(relative_path):
+            if hasattr(sys, '_MEIPASS'):
+                return os.path.join(sys._MEIPASS, relative_path)
+            return os.path.join(os.path.abspath('.'), relative_path)
+
+        if __name__ == '__main__':
+            dist_dir = get_resource_path('dist')
+            index_path = os.path.join(dist_dir, 'index.html')
+            window = webview.create_window('Hoai Studio Automation', index_path)
+            webview.start()
+        "@
+
+    - name: Package EXE with PyInstaller
+      run: |
+        pyinstaller --onefile --noconsole --add-data "dist;dist" --name "Hoai_Studio_Automation" app_launcher.py
+
+    - name: Upload EXE Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Hoai-Studio-Automation-EXE
+        path: dist/Hoai_Studio_Automation.exe
