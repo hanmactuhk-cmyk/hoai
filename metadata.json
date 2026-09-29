@@ -1,0 +1,6 @@
+{
+  "name": "Hoai Studio Automation",
+  "description": "Phần mềm tạo video tự động hàng loạt trên nền tảng Flow hỗ trợ xoay vòng 20+ tài khoản, 4 luồng xử lý song song và tạo video đồng nhất nhân vật.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
